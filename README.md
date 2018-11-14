@@ -1,5 +1,10 @@
 # kafka-connect-transformers
 
+## Build
+```sh
+./gradlew assemble
+```
+
 ## Transformations
 
 - LogicalFieldToString - Format logical fields value
