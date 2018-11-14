@@ -22,13 +22,12 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.github.maiflai:gradle-scalatest:0.16'
+        classpath 'com.github.maiflai:gradle-scalatest:0.19'
         classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0'
         classpath 'net.researchgate:gradle-release:2.6.0'
     }
 }
 
-apply plugin: 'signing'
 apply plugin: 'io.codearte.nexus-staging'
 apply plugin: 'net.researchgate.release'
 
@@ -144,8 +143,12 @@ allprojects {
     task compile(dependsOn: 'compileScala')
     javadoc.dependsOn scaladoc
 
-    signing {
-        sign configurations.archives
+    // add conditional signing configuration
+    if (project.hasProperty("signing.keyId")) {
+        apply plugin: 'signing'
+        signing {
+            sign configurations.archives
+        }
     }
 
     // OSSRH publication
