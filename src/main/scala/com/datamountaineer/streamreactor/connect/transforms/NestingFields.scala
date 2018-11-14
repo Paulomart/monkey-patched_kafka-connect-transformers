@@ -13,6 +13,8 @@ import org.apache.kafka.connect.transforms.util.{SchemaUtil, SimpleConfig}
 
 import scala.collection.JavaConversions._
 
+import org.slf4j.{Logger, LoggerFactory}
+
 object NestingFields {
   private val PURPOSE = "nesting fields from value to new field"
   private val NESTED_NAME_CONFIG = "nested.name"
@@ -46,6 +48,7 @@ abstract class NestingFields[R <: ConnectRecord[R]] extends Transformation[R] {
   private var fields: List[String] = _
   private var nestedName: String = _
   private var schemaUpdateCache: Cache[Schema, Schema] = _
+  private val LOG: Logger = LoggerFactory.getLogger(NestingFields.getClass)
 
   override def configure(props: util.Map[String, _]): Unit = {
     val config = new SimpleConfig(NestingFields.CONFIG_DEF, props)
