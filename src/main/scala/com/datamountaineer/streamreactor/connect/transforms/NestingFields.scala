@@ -76,15 +76,15 @@ abstract class NestingFields[R <: ConnectRecord[R]] extends Transformation[R] {
       schemaUpdateCache.put(value.schema, updatedSchema)
     }
     val newNestedSchema = updatedSchema.field(nestedName).schema
-    val newNestedValue = new Struct(newNestedSchema)
+    val newNestedValue = new util.HashMap[String, String]()
     val updatedValue = new Struct(updatedSchema)
-    
+
     for (field <- value.schema.fields) {
       updatedValue.put(field.name, value.get(field))
     }
-    
+
     for (field <- value.schema.fields) {
-      if (fields.contains(field.name)) newNestedValue.put(field.name, value.get(field))
+      if (fields.contains(field.name)) newNestedValue.put(field.name, String.valueOf(value.get(field)))
     }
 
     updatedValue.put(nestedName, newNestedValue)
@@ -93,13 +93,13 @@ abstract class NestingFields[R <: ConnectRecord[R]] extends Transformation[R] {
 
   private def makeUpdatedSchema(schema: Schema) = {
     val builder = SchemaUtil.copySchemaBasics(schema, SchemaBuilder.struct)
-    val nestedStruct = SchemaBuilder.struct
-    builder.field(nestedName, nestedStruct)
+    val nestedStruct = SchemaBuilder.map(Schema.STRING_SCHEMA, Schema.STRING_SCHEMA)
     import scala.collection.JavaConversions._
     for (field <- schema.fields) {
       builder.field(field.name, field.schema)
-      if (fields.contains(field.name)) nestedStruct.field(field.name, field.schema)
+      // if (fields.contains(field.name)) nestedStruct.field(field.name, field.schema)
     }
+    builder.field(nestedName, nestedStruct.build)
     builder.build
   }
 
